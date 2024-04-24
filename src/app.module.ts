@@ -4,8 +4,11 @@ import { AppService } from './app.service';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { LoggerMiddleware } from './common/middleware/logger.middleware';
-import { UsersModule } from './users/users.module';
 import { DataSource } from 'typeorm';
+import { AuthorsModule } from './authors/authors.module';
+import { UsersModule } from './users/users.module';
+import { BooksModule } from './books/books.module';
+import { AuthModule } from './auth/auth.module';
 
 @Module({
   imports: [
@@ -26,6 +29,9 @@ import { DataSource } from 'typeorm';
       inject: [ConfigService],
     }),
     UsersModule,
+    AuthorsModule,
+    BooksModule,
+    AuthModule,
   ],
   controllers: [AppController],
   providers: [AppService],

@@ -1,43 +1,57 @@
 import {
-  Body,
   Controller,
-  Delete,
   Get,
-  Param,
-  Patch,
   Post,
-  Query,
+  Body,
+  Patch,
+  Param,
+  Delete,
+  ParseIntPipe,
 } from '@nestjs/common';
 import { UsersService } from './users.service';
+import { CreateUserDto } from './dto/create-user.dto';
+import { UpdateUserDto } from './dto/update-user.dto';
+import { UpdateUserProfileDto } from './dto/update-user-profile.dto';
 
 @Controller('users')
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
-  @Patch(':id') // PATCH /users
-  update(@Param('id') id: string, @Body() userUpdate: any) {
-    console.log('Update received');
-
-    return this.usersService.update(+id, userUpdate);
+  @Post()
+  create(@Body() createUserDto: CreateUserDto) {
+    return this.usersService.create(createUserDto);
   }
 
-  @Get() // GET /users or /users?role=value
-  findAll(@Query('isActive') isActive: '0' | '1') {
-    return this.usersService.findAll({ isActive });
+  @Get()
+  findAll() {
+    return this.usersService.findAll();
   }
 
-  @Get(':id') // GET /users/:id
-  findOne(@Param('id') id: string) {
-    return this.usersService.findOne(+id);
+  @Get(':id')
+  findOne(@Param('id', ParseIntPipe) id: string) {
+    return this.usersService.findOne({ id: +id });
   }
 
-  @Post() // POST /users
-  create(@Body() user: any) {
-    return this.usersService.create(user);
+  @Patch(':id')
+  update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
+    return this.usersService.update(+id, updateUserDto);
   }
 
   @Delete(':id')
-  deleteOne(@Param('id') id: string) {
+  delete(@Param('id', ParseIntPipe) id: string) {
     return this.usersService.remove(+id);
+  }
+
+  @Get(':userId/user-profile')
+  findOneUserProfile(@Param('userId', ParseIntPipe) id: string) {
+    return this.usersService.findOneUserProfile(+id);
+  }
+
+  @Patch(':userId/user-profile')
+  updateUserProfile(
+    @Param('userId', ParseIntPipe) id: string,
+    @Body() updateUserProfileDto: UpdateUserProfileDto,
+  ) {
+    return this.usersService.updateUserProfile(+id, updateUserProfileDto);
   }
 }
