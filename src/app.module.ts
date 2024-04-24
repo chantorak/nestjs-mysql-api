@@ -9,6 +9,9 @@ import { AuthorsModule } from './authors/authors.module';
 import { UsersModule } from './users/users.module';
 import { BooksModule } from './books/books.module';
 import { AuthModule } from './auth/auth.module';
+import { APP_GUARD } from '@nestjs/core';
+import { AuthGuard } from './auth/auth.guard';
+import { JwtModule } from '@nestjs/jwt';
 
 @Module({
   imports: [
@@ -32,9 +35,23 @@ import { AuthModule } from './auth/auth.module';
     AuthorsModule,
     BooksModule,
     AuthModule,
+    JwtModule.registerAsync({
+      imports: [ConfigModule],
+      useFactory: (configService: ConfigService) => ({
+        secret: configService.get('JWT_KEY'),
+        global: true,
+      }),
+      inject: [ConfigService],
+    }),
   ],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [
+    AppService,
+    {
+      provide: APP_GUARD,
+      useClass: AuthGuard,
+    },
+  ],
 })
 export class AppModule implements NestModule {
   constructor(private dataSource: DataSource) {}

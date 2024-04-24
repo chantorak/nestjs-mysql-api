@@ -24,7 +24,7 @@ export class BooksService {
   }
 
   findOne(id: number) {
-    return this.booksRepository.findBy({ id });
+    return this.booksRepository.findOneBy({ id });
   }
 
   update(id: number, updateBookDto: UpdateBookDto) {
