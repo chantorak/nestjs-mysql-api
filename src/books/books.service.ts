@@ -1,37 +1,43 @@
-import { Injectable } from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
 import { CreateBookDto } from './dto/create-book.dto';
 import { UpdateBookDto } from './dto/update-book.dto';
 import { Book } from './entities/book.entity';
-import { Repository } from 'typeorm';
-import { InjectRepository } from '@nestjs/typeorm';
+import { TenantConnectionService } from 'src/tenant/tenant.module';
 
 @Injectable()
 export class BooksService {
-  constructor(
-    @InjectRepository(Book)
-    private booksRepository: Repository<Book>,
-  ) {}
+  constructor(@Inject(TenantConnectionService) private connection) {}
 
-  create(createBookDto: CreateBookDto) {
+  async create(createBookDto: CreateBookDto) {
     const newBook = new Book();
     newBook.name = createBookDto.name;
 
-    return this.booksRepository.save(newBook);
+    const booksRepository = await this.connection.getRepository(Book);
+
+    return booksRepository.save(newBook);
   }
 
-  findAll() {
-    return this.booksRepository.find();
+  async findAll() {
+    const booksRepository = await this.connection.getRepository(Book);
+
+    return booksRepository.find();
   }
 
-  findOne(id: number) {
-    return this.booksRepository.findOneBy({ id });
+  async findOne(id: number) {
+    const booksRepository = await this.connection.getRepository(Book);
+
+    return booksRepository.findOneBy({ id });
   }
 
-  update(id: number, updateBookDto: UpdateBookDto) {
-    return this.booksRepository.save(updateBookDto);
+  async update(id: number, updateBookDto: UpdateBookDto) {
+    const booksRepository = await this.connection.getRepository(Book);
+
+    return booksRepository.save(updateBookDto);
   }
 
-  remove(id: number) {
-    return this.booksRepository.delete(id);
+  async remove(id: number) {
+    const booksRepository = await this.connection.getRepository(Book);
+
+    return booksRepository.delete(id);
   }
 }

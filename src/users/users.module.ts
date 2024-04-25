@@ -6,9 +6,14 @@ import { User } from './entities/user.entity';
 import { UserProfile } from 'src/users/entities/user-profile.entity';
 import { Book } from 'src/books/entities/book.entity';
 import { ConfigModule } from '@nestjs/config';
+import { TenantModule } from 'src/tenant/tenant.module';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([User, UserProfile, Book]), ConfigModule],
+  imports: [
+    TypeOrmModule.forFeature([User, UserProfile, Book]),
+    ConfigModule,
+    TenantModule,
+  ],
   controllers: [UsersController],
   providers: [UsersService],
   exports: [UsersService],

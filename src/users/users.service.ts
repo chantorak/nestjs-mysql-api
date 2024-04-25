@@ -1,22 +1,18 @@
 import * as bcrypt from 'bcrypt';
-import { Injectable } from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { CreateUserProfileDto } from './dto/create-user-profile.dto';
 import { UpdateUserProfileDto } from './dto/update-user-profile.dto';
-import { InjectRepository } from '@nestjs/typeorm';
 import { User } from './entities/user.entity';
-import { Repository } from 'typeorm';
 import { UserProfile } from './entities/user-profile.entity';
 import { ConfigService } from '@nestjs/config';
+import { TenantConnectionService } from 'src/tenant/tenant.module';
 
 @Injectable()
 export class UsersService {
   constructor(
-    @InjectRepository(User)
-    private usersRepository: Repository<User>,
-    @InjectRepository(UserProfile)
-    private userProfilesRepository: Repository<UserProfile>,
+    @Inject(TenantConnectionService) private connection,
     private configService: ConfigService,
   ) {}
 
@@ -30,56 +26,81 @@ export class UsersService {
       +this.configService.get('SALT_ROUNDS'),
     );
 
-    await this.usersRepository.save(newUser);
+    const usersRepository = await this.connection.getRepository(User);
+    await usersRepository.save(newUser);
   }
 
-  findAll() {
-    return this.usersRepository.find();
+  async findAll() {
+    const usersRepository = await this.connection.getRepository(User);
+
+    return usersRepository.find();
   }
 
-  findOne(filter: { id?: number; userName?: string }) {
-    return this.usersRepository.findOneBy(filter);
+  async findOne(filter: { id?: number; userName?: string }) {
+    const usersRepository = await this.connection.getRepository(User);
+
+    return usersRepository.findOneBy(filter);
   }
 
-  update(id: number, updateUserDto: UpdateUserDto) {
+  async update(id: number, updateUserDto: UpdateUserDto) {
     const updateUser = new User();
     updateUser.userName = updateUserDto.userName;
     updateUser.isActive = updateUserDto.isActive;
 
     updateUser.id = id;
 
-    return this.usersRepository.save(updateUser);
+    const usersRepository = await this.connection.getRepository(User);
+
+    return usersRepository.save(updateUser);
   }
 
-  remove(id: number) {
-    return this.usersRepository.delete(id);
+  async remove(id: number) {
+    const usersRepository = await this.connection.getRepository(User);
+
+    return usersRepository.delete(id);
   }
 
-  createUserProfile(createUserProfileDto: CreateUserProfileDto) {
+  async createUserProfile(createUserProfileDto: CreateUserProfileDto) {
     const newUserProfile = new UserProfile();
     newUserProfile.biography = createUserProfileDto.biography;
+    const usersRepository = await this.connection.getRepository(User);
 
-    return this.usersRepository.save(newUserProfile);
+    return usersRepository.save(newUserProfile);
   }
 
-  findAllUserProfile() {
-    return this.userProfilesRepository.find();
+  async findAllUserProfile() {
+    const userProfilesRepository =
+      await this.connection.getRepository(UserProfile);
+
+    return userProfilesRepository.find();
   }
 
-  findOneUserProfile(id: number) {
-    return this.userProfilesRepository.findOneBy({ id });
+  async findOneUserProfile(id: number) {
+    const userProfilesRepository =
+      await this.connection.getRepository(UserProfile);
+
+    return userProfilesRepository.findOneBy({ id });
   }
 
-  updateUserProfile(id: number, updateUserProfileDto: UpdateUserProfileDto) {
+  async updateUserProfile(
+    id: number,
+    updateUserProfileDto: UpdateUserProfileDto,
+  ) {
     const updateUserProfile = new UserProfile();
     updateUserProfile.biography = updateUserProfileDto.biography;
 
     updateUserProfile.id = id;
 
-    return this.userProfilesRepository.save(updateUserProfile);
+    const userProfilesRepository =
+      await this.connection.getRepository(UserProfile);
+
+    return userProfilesRepository.save(updateUserProfile);
   }
 
-  removeUserProfile(id: number) {
-    return this.userProfilesRepository.delete(id);
+  async removeUserProfile(id: number) {
+    const userProfilesRepository =
+      await this.connection.getRepository(UserProfile);
+
+    return userProfilesRepository.delete(id);
   }
 }

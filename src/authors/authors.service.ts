@@ -1,46 +1,51 @@
-import { Injectable } from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
 import { CreateAuthorDto } from './dto/create-author.dto';
 import { UpdateAuthorDto } from './dto/update-author.dto';
 import { Author } from './entities/author.entity';
 import { Book } from 'src/books/entities/book.entity';
-import { Repository } from 'typeorm';
-import { InjectRepository } from '@nestjs/typeorm';
+import { TenantConnectionService } from 'src/tenant/tenant.module';
 
 @Injectable()
 export class AuthorsService {
-  constructor(
-    @InjectRepository(Author)
-    private authorsRepository: Repository<Author>,
-    @InjectRepository(Book)
-    private booksRepository: Repository<Book>,
-  ) {}
+  constructor(@Inject(TenantConnectionService) private connection) {}
 
-  create(createAuthorDto: CreateAuthorDto) {
-    return this.authorsRepository.save(createAuthorDto);
+  async create(createAuthorDto: CreateAuthorDto) {
+    const authorsRepository = await this.connection.getRepository(Author);
+
+    return authorsRepository.save(createAuthorDto);
   }
 
-  findAll() {
-    return this.authorsRepository.find();
+  async findAll() {
+    const authorsRepository = await this.connection.getRepository(Author);
+
+    return authorsRepository.find();
   }
 
-  findOne(id: number) {
-    return this.authorsRepository.findOneBy({ id });
+  async findOne(id: number) {
+    const authorsRepository = await this.connection.getRepository(Author);
+
+    return authorsRepository.findOneBy({ id });
   }
 
-  update(id: number, updateAuthorDto: UpdateAuthorDto) {
+  async update(id: number, updateAuthorDto: UpdateAuthorDto) {
     const updatigAuthor = new Author();
     updatigAuthor.firstName = updateAuthorDto.firstName;
     updatigAuthor.lastName = updateAuthorDto.lastName;
+    const authorsRepository = await this.connection.getRepository(Author);
 
-    return this.authorsRepository.save(updateAuthorDto);
+    return authorsRepository.save(updateAuthorDto);
   }
 
-  remove(id: number) {
-    return this.authorsRepository.delete(id);
+  async remove(id: number) {
+    const authorsRepository = await this.connection.getRepository(Author);
+
+    return authorsRepository.delete(id);
   }
 
-  findAllBooks(authorId: number) {
-    return this.booksRepository.find({
+  async findAllBooks(authorId: number) {
+    const bookRepository = await this.connection.getRepository(Book);
+
+    return bookRepository.find({
       where: {
         id: authorId,
       },

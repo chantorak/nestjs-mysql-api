@@ -12,6 +12,12 @@ import { AuthModule } from './auth/auth.module';
 import { APP_GUARD } from '@nestjs/core';
 import { AuthGuard } from './auth/auth.guard';
 import { JwtModule } from '@nestjs/jwt';
+import { TenantModule } from './tenant/tenant.module';
+import { Tenant } from './tenant/tenant.entity';
+import { User } from './users/entities/user.entity';
+import { Book } from './books/entities/book.entity';
+import { Author } from './authors/entities/author.entity';
+import { UserProfile } from './users/entities/user-profile.entity';
 
 @Module({
   imports: [
@@ -20,14 +26,29 @@ import { JwtModule } from '@nestjs/jwt';
       imports: [ConfigModule],
       useFactory: (configService: ConfigService) => ({
         type: 'mysql',
+        name: 'masterDB',
         host: configService.get('DB_HOST'),
         port: +configService.get('DB_PORT'),
         username: configService.get('DB_USERNAME'),
         password: configService.get('DB_PASSWORD'),
-        database: configService.get('DB_NAME'),
-        entities: [],
+        database: configService.get('DB_MASTER_NAME'),
+        entities: [Tenant],
         synchronize: true,
-        autoLoadEntities: true,
+      }),
+      inject: [ConfigService],
+    }),
+    TypeOrmModule.forRootAsync({
+      imports: [ConfigModule],
+      useFactory: (configService: ConfigService) => ({
+        type: 'mysql',
+        name: 'testOrgDB',
+        host: configService.get('DB_HOST'),
+        port: +configService.get('DB_PORT'),
+        username: configService.get('DB_USERNAME'),
+        password: configService.get('DB_PASSWORD'),
+        database: 'testOrgDB',
+        entities: [User, UserProfile, Book, Author],
+        synchronize: true,
       }),
       inject: [ConfigService],
     }),
@@ -43,6 +64,7 @@ import { JwtModule } from '@nestjs/jwt';
       }),
       inject: [ConfigService],
     }),
+    TenantModule,
   ],
   controllers: [AppController],
   providers: [
