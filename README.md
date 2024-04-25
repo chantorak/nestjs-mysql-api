@@ -12,6 +12,8 @@ Insert this record in the 'tenant' table in the 'masterDB' (can use 'adminer' on
 
 | method | path  
 | :---:   | :---:
+| POST | /auth/login
+| POST | /auth/profile
 | GET | /uers/1
 | POST | /uers
 | PATCH | /uers/1
