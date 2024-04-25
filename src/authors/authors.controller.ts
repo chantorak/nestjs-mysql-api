@@ -44,11 +44,6 @@ export class AuthorsController {
     return this.authorsService.remove(+id);
   }
 
-  @Post(':authorId/books')
-  createBook(@Body() createAuthorDto: CreateAuthorDto) {
-    return this.authorsService.create(createAuthorDto);
-  }
-
   @Get(':authorId/books')
   findAllBooks(@Param('authorId') authorId: string) {
     return this.authorsService.findAllBooks(+authorId);

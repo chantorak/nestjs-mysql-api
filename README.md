@@ -8,6 +8,33 @@ Insert this record in the 'tenant' table in the 'masterDB' (can use 'adminer' on
 | :---:   | :---:
 | testOrg | testOrgDB
 
+## Endpoints
+
+| method | path  
+| :---:   | :---:
+| GET | /uers/1
+| POST | /uers
+| PATCH | /uers/1
+| GET | /uers
+| DELETE | /uers/1
+| GET | :userId/user-profile
+| PATCH | :usder/user-profile
+| GET | /books/1
+| POST | /books
+| PATCH | /books/1
+| GET | /books
+| DELETE | /books/1
+| GET | /books/1
+| POST | /books
+| PATCH | /books/1
+| GET | /books
+| DELETE | /books/1
+| GET | /authors/1
+| POST | /authors
+| PATCH | /authors/1
+| GET | /authors
+| DELETE | /authors/1
+| GET | /authors/books
 
 ## TO-DO
 Some of the things that need completing, as this was the first time I was using NestJs, I had to spend time learning the basics
