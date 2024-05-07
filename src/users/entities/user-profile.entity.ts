@@ -12,7 +12,9 @@ export class UserProfile {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column()
+  @Column({
+    default: '',
+  })
   biography: string;
 
   @ManyToMany(() => Book)

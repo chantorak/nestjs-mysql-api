@@ -17,9 +17,17 @@ export class UsersService {
   ) {}
 
   async create(createUserDto: CreateUserDto) {
+    const userProfile = new UserProfile();
+
     const newUser = new User();
     newUser.userName = createUserDto.userName;
     newUser.isActive = createUserDto.isActive;
+
+    newUser.userProfile = userProfile;
+
+    const userProfilesRepository =
+      await this.connection.getRepository(UserProfile);
+    userProfilesRepository.save(userProfile);
 
     newUser.password = await bcrypt.hash(
       createUserDto.password,
